@@ -4,38 +4,36 @@ package com.sijifeng.kafka.javasdk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import kafka.serializer.StringEncoder;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sijifeng.kafka.javasdk.thrift.Data;
 
 
-public class KafkaNewProducerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaNewProducerAdapter.class);
+public class KafkaProducerAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerAdapter.class);
     
     private static KafkaProducer kafkaProducer = null;
 
-    private static KafkaNewProducerAdapter kafkaProducerAdapter = null;
+    private static KafkaProducerAdapter kafkaProducerAdapter = null;
 
-    private KafkaNewProducerAdapter() { }
+    private KafkaProducerAdapter() { }
     
     /**
      * 单例
      * @return
      */
-    public static KafkaNewProducerAdapter getInstance() {
+    public static KafkaProducerAdapter getInstance() {
         if (kafkaProducerAdapter == null) {
-            synchronized (KafkaNewProducerAdapter.class) {
+            synchronized (KafkaProducerAdapter.class) {
                 if (kafkaProducerAdapter == null) {
-                    kafkaProducerAdapter = new KafkaNewProducerAdapter();
+                    kafkaProducerAdapter = new KafkaProducerAdapter();
                 }
             }
         }
@@ -44,8 +42,8 @@ public class KafkaNewProducerAdapter {
 
     public void init (KafkaConfig kafkaConfig) throws Exception {
         try {
+            long p1 = System.currentTimeMillis();
             Properties props = new Properties();
-            
             List<String> kafkaServers = new ArrayList<String>();
             for(String kafkaServer : kafkaConfig.brokerLists.split(",")) {
                 if(kafkaServer != null && kafkaServer.contains(":")) {
@@ -59,8 +57,12 @@ public class KafkaNewProducerAdapter {
             props.put("retries", 1);
             props.put("max.request.size", 100000);
             props.put("client.id", "DemoProducer");
+            long p2 = System.currentTimeMillis();
           
             kafkaProducer = new KafkaProducer<>(props);
+            long p3 = System.currentTimeMillis();
+            
+            System.out.println("===="+(p2-p1)+"             ===="+(p3-p2));
         } catch (Exception e) {
             throw new Exception("init kafka producer exception:" + e.getMessage());
         }
@@ -80,7 +82,15 @@ public class KafkaNewProducerAdapter {
         ProducerRecord record;
         if(null != data){
             record = new ProducerRecord<>(topic, null, data.toJson());
-            kafkaProducer.send(record);
+            try {
+                System.out.println(((RecordMetadata)kafkaProducer.send(record).get()).partition());
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
     
@@ -107,9 +117,8 @@ public class KafkaNewProducerAdapter {
         }
         @Override
         public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-            e.printStackTrace();
             //send success
-            /*if (null == e) {
+            if (null == e) {
                 String meta = "topic:" + recordMetadata.topic() + ", partition:"
                         + recordMetadata.topic() + ", offset:" + recordMetadata.offset();
                 logger.info("send message success, record:" + record.toString() + ", meta:" + meta);
@@ -119,7 +128,7 @@ public class KafkaNewProducerAdapter {
             logger.error("send message failed, seq:" + sendSeq + ", record:" + record.toString() + ", errmsg:" + e.getMessage());
             if (sendSeq < 1) {
                 kafkaProducer.send(record, new SendCallback(record, ++sendSeq));
-            }*/
+            }
         }
     }
     

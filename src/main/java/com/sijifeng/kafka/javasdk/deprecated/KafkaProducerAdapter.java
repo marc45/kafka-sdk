@@ -1,4 +1,4 @@
-package com.sijifeng.kafka.javasdk;
+package com.sijifeng.kafka.javasdk.deprecated;
 
 
 import java.util.LinkedList;
@@ -15,24 +15,24 @@ import org.slf4j.LoggerFactory;
 import com.sijifeng.kafka.javasdk.thrift.Data;
 
 
-public class KafkaOldProducerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaOldProducerAdapter.class);
+public class KafkaProducerAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerAdapter.class);
     
     private static Producer<String, String> producer = null;
 
-    private static KafkaOldProducerAdapter kafkaProducerAdapter = null;
+    private static KafkaProducerAdapter kafkaProducerAdapter = null;
 
-    private KafkaOldProducerAdapter() { }
+    private KafkaProducerAdapter() { }
     
     /**
      * 单例
      * @return
      */
-    public static KafkaOldProducerAdapter getInstance() {
+    public static KafkaProducerAdapter getInstance() {
         if (kafkaProducerAdapter == null) {
-            synchronized (KafkaOldProducerAdapter.class) {
+            synchronized (KafkaProducerAdapter.class) {
                 if (kafkaProducerAdapter == null) {
-                    kafkaProducerAdapter = new KafkaOldProducerAdapter();
+                    kafkaProducerAdapter = new KafkaProducerAdapter();
                 }
             }
         }
