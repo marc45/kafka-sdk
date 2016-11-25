@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.sijifeng.kafka.javasdk.thrift.Data;
 
 
-public class KafkaSink extends AbstractSink{
+public class KafkaSink {
     private static final Logger logger = LoggerFactory.getLogger(KafkaSink.class);
     
     private List<KeyedMessage<String, String>> messageList;
