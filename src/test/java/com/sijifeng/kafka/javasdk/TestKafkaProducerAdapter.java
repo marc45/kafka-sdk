@@ -2,8 +2,12 @@ package com.sijifeng.kafka.javasdk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.junit.Test;
 
 import com.sijifeng.kafka.javasdk.thrift.Data;
@@ -35,4 +39,33 @@ public class TestKafkaProducerAdapter {
             e.printStackTrace();
         }
     }
+    
+    @Test
+    public void Test() {
+        Properties kafkaProperties = new Properties();
+        List<String> kafkaServers = new ArrayList<String>();
+        String topic = "test";
+        String msg = "12345";
+        String key = "123";
+        kafkaServers.add("192.168.78.48:9092");
+        kafkaProperties.put("bootstrap.servers", kafkaServers);
+        kafkaProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProperties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProperties.put("acks", "1");
+        kafkaProperties.put("retries", 1);
+        kafkaProperties.put("max.request.size", 100000);
+        kafkaProperties.put("client.id", "scribe_producer");
+        long t1 = System.currentTimeMillis();
+        System.out.println("开始初始化："+ t1);
+        
+        KafkaProducer<String, String> kp = new KafkaProducer<String, String>(kafkaProperties);
+        long t2 = System.currentTimeMillis();
+        System.out.println("结束初始化："+ t2);
+        System.out.println("耗时 = "+(t2 - t1));
+        ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, 0, key, msg);
+        kp.send(record);
+        kp.close();
+    }
+    
+
 }

@@ -44,29 +44,29 @@ public class KafkaProducerAdapter {
         try {
             long p1 = System.currentTimeMillis();
             Properties props = new Properties();
-            List<String> kafkaServers = new ArrayList<String>();
+            /*List<String> kafkaServers = new ArrayList<String>();
             for(String kafkaServer : kafkaConfig.brokerLists.split(",")) {
                 if(kafkaServer != null && kafkaServer.contains(":")) {
                     kafkaServers.add(kafkaServer);
                 }
-            }
-            props.put("bootstrap.servers", kafkaServers);
+            }*/
+            props.put("bootstrap.servers", kafkaConfig.brokerLists);
             props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
             props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
             props.put("acks", "1");
             props.put("retries", 1);
             props.put("max.request.size", 100000);
-            props.put("client.id", "DemoProducer");
+            props.put("client.id", "Kafka SDK");
             long p2 = System.currentTimeMillis();
-          
             kafkaProducer = new KafkaProducer<>(props);
-            long p3 = System.currentTimeMillis();
             
+            long p3 = System.currentTimeMillis();
             System.out.println("===="+(p2-p1)+"             ===="+(p3-p2));
         } catch (Exception e) {
             throw new Exception("init kafka producer exception:" + e.getMessage());
         }
     }
+    
     
     public void send(String topic, List<Data> datas) {
         ProducerRecord record;
@@ -83,7 +83,7 @@ public class KafkaProducerAdapter {
         if(null != data){
             record = new ProducerRecord<>(topic, null, data.toJson());
             try {
-                System.out.println(((RecordMetadata)kafkaProducer.send(record).get()).partition());
+                kafkaProducer.send(record).get();
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
