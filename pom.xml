@@ -21,7 +21,7 @@ limitations under the License.
   <artifactId>kafka-sdk</artifactId>
   <name>Kafka SDK</name>
   <description>Kafka SDK</description>
-  <version>1.0.0</version>
+  <version>0.1.0</version>
 
 
    <build>
@@ -77,15 +77,14 @@ limitations under the License.
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <!-- only used for tests -->
-	  <version>1.6.1</version>
+	  <version>1.7.12</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <!-- only used for tests -->
-	  <version>1.6.1</version>
+	  <version>1.7.12</version>
       <optional>true</optional>
     </dependency>
 

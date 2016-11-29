@@ -18,7 +18,7 @@ public class TestKafkaProducerAdapter {
     public void NewkafkaProdecerTest(){
         
         KafkaProducerAdapter adapter = KafkaProducerAdapter.getInstance();
-        KafkaConfig kafkaConfig = new KafkaConfig("192.168.78.48:9092", "192.168.78.48:2182");
+        KafkaConfig kafkaConfig = new KafkaConfig("192.168.78.48:9092");
         try {
             long p1 = System.currentTimeMillis();
             adapter.init(kafkaConfig);

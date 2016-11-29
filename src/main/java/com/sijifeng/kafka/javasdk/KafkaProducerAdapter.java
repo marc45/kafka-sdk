@@ -1,7 +1,6 @@
 package com.sijifeng.kafka.javasdk;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +24,10 @@ public class KafkaProducerAdapter {
 
     private KafkaProducerAdapter() { }
     
+    public KafkaProducer getkafkaProducer() {
+        return kafkaProducer;
+    }
+    
     /**
      * 单例
      * @return
@@ -44,12 +47,6 @@ public class KafkaProducerAdapter {
         try {
             long p1 = System.currentTimeMillis();
             Properties props = new Properties();
-            /*List<String> kafkaServers = new ArrayList<String>();
-            for(String kafkaServer : kafkaConfig.brokerLists.split(",")) {
-                if(kafkaServer != null && kafkaServer.contains(":")) {
-                    kafkaServers.add(kafkaServer);
-                }
-            }*/
             props.put("bootstrap.servers", kafkaConfig.brokerLists);
             props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
             props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -68,31 +65,26 @@ public class KafkaProducerAdapter {
     }
     
     
-    public void send(String topic, List<Data> datas) {
-        ProducerRecord record;
-        for(Data data : datas) {
-            if(null != data){
-                record = new ProducerRecord<>(topic, "", data.toJson());
-                kafkaProducer.send(record, new SendCallback(record, 0));
-            }
-        }
-    }
-    
     public void send(String topic, Data data) {
         ProducerRecord record;
         if(null != data){
             record = new ProducerRecord<>(topic, null, data.toJson());
-            try {
-                kafkaProducer.send(record).get();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            kafkaProducer.send(record);
+        }
+    }
+    
+    
+    public void sendBatch(String topic, List<Data> datas) {
+        ProducerRecord record;
+        for(Data data : datas) {
+            if(null != data){
+                record = new ProducerRecord<>(topic, "", data.toJson());
+                kafkaProducer.send(record);
             }
         }
     }
+    
+    
     
     /**
      * 发送一条消息
@@ -104,6 +96,19 @@ public class KafkaProducerAdapter {
         kafkaProducer.send(record, new SendCallback(record, 0));
     }
 
+    
+    /**
+     * 发送多条消息
+     * @param message
+     */
+    public void send(String topic, List<String> messages) {
+        ProducerRecord record;
+        for(String message : messages) {
+            record = new ProducerRecord<>(topic, "", message);
+            kafkaProducer.send(record, new SendCallback(record, 0));
+        }
+    }
+    
     /**
      * producer回调
      */
@@ -129,6 +134,13 @@ public class KafkaProducerAdapter {
             if (sendSeq < 1) {
                 kafkaProducer.send(record, new SendCallback(record, ++sendSeq));
             }
+        }
+    }
+    
+    
+    public void close() {
+        if(null != kafkaProducer) {
+            kafkaProducer.close();
         }
     }
     
